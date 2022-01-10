@@ -15,18 +15,8 @@ builder.Services.AddAuthentication(options =>
     .AddJwtBearer(options =>
     {
         options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = "https://localhost:7100",
-            ValidateAudience = true,
-            ValidAudience = "https://localhost:7100",
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("too_strong_access_secret_key")),
-            ValidateLifetime = true,
-            RequireExpirationTime = true,
-            ClockSkew = TimeSpan.Zero,
-        };
+        options.Authority = "https://localhost:7100";
+        options.Audience = "https://localhost:7100";
     });
 
 #region Swagger
