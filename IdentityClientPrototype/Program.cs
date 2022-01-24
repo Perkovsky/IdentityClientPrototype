@@ -1,27 +1,43 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
-using IdentityClientPrototype.Infrastructure;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
 
+#region Authentication
+
+var issuer = "https://localhost:7100/";
+
 builder.Services.AddAuthentication(options =>
     {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
     })
     .AddJwtBearer(options =>
     {
-        options.RequireHttpsMetadata = false;
-        options.Authority = "https://localhost:7100";
-        options.Audience = "https://localhost:7100";
-        options.BackchannelHttpHandler = new CustomBackchannelHttpHandler(builder.Services);
+        options.Authority = issuer;
+        options.Audience = "postman";
+        options.IncludeErrorDetails = true;
+        options.SaveToken = true;
+    })
+    .AddOpenIdConnect(options =>
+    {
+        options.SignInScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.Authority = issuer;
+        options.ClaimsIssuer = issuer;
+        options.ClientId = "postman";
+        options.ClientSecret = "postman-secret";
+        options.RequireHttpsMetadata = true;
+        options.ResponseType = Parameters.Code;
+        options.UsePkce = true;
+        options.SaveTokens = true;
+        options.GetClaimsFromUserInfoEndpoint = true;
     });
+
+#endregion
 
 #region Swagger
 
