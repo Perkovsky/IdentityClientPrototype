@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using static OpenIddict.Abstractions.OpenIddictConstants;
+using OpenIddict.Validation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,33 +8,21 @@ builder.Services.AddHttpContextAccessor();
 
 #region Authentication
 
-var issuer = "https://localhost:7100/";
+builder.Services.AddOpenIddict()
+    .AddValidation(options =>
+    {
+        options.SetIssuer("https://localhost:7100/");
+        //options.AddAudiences("postman");
 
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.Authority = issuer;
-        options.Audience = "postman";
-        options.IncludeErrorDetails = true;
-        options.SaveToken = true;
-    })
-    .AddOpenIdConnect(options =>
-    {
-        options.SignInScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.Authority = issuer;
-        options.ClaimsIssuer = issuer;
-        options.ClientId = "postman";
-        options.ClientSecret = "postman-secret";
-        options.RequireHttpsMetadata = true;
-        options.ResponseType = Parameters.Code;
-        options.UsePkce = true;
-        options.SaveTokens = true;
-        options.GetClaimsFromUserInfoEndpoint = true;
+        options.UseIntrospection()
+            .SetClientId("postman")
+            .SetClientSecret("postman-secret");
+
+        options.UseSystemNetHttp();
+        options.UseAspNetCore();
     });
+
+builder.Services.AddAuthentication(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
 
 #endregion
 
