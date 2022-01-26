@@ -12,7 +12,7 @@ builder.Services.AddOpenIddict()
     .AddValidation(options =>
     {
         options.SetIssuer("https://localhost:7100/");
-        //options.AddAudiences("postman");
+        options.AddAudiences("postman");
 
         options.UseIntrospection()
             .SetClientId("postman")
