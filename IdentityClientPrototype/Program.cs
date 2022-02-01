@@ -13,6 +13,7 @@ builder.Services.AddOpenIddict()
     {
         options.SetIssuer("https://localhost:7100/");
         options.AddAudiences("postman");
+        options.AddAudiences("anonymous");
 
         options.UseIntrospection()
             .SetClientId("postman")
