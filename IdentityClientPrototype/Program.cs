@@ -1,4 +1,6 @@
+using IdentityClientPrototype.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
 using OpenIddict.Validation.AspNetCore;
 
@@ -19,11 +21,36 @@ builder.Services.AddOpenIddict()
             .SetClientId("postman")
             .SetClientSecret("postman-secret");
 
+        //options.Configure(c =>
+        //{
+        //    c.ValidationType = OpenIddictValidationType.Introspection;
+        //    //c.TokenValidationParameters.NameClaimType = OpenIddictConstants.Claims.Subject;
+        //    //c.TokenValidationParameters.RoleClaimType = OpenIddictConstants.Claims.Role;
+        //    ////c.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
+        //    //c.TokenValidationParameters.RoleClaimTypeRetriever = (token, s) =>
+        //    //{
+        //    //    return "<some_text>";
+        //    //};
+        //});
+
         options.UseSystemNetHttp();
         options.UseAspNetCore();
     });
-
 builder.Services.AddAuthentication(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+builder.Services.AddAuthorization(options =>
+{
+    options.DefaultPolicy = new AuthorizationPolicyBuilder()
+        .AddAuthenticationSchemes(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)
+        .RequireAuthenticatedUser()
+        //.RequireRole("Accounting")
+        .RequireAssertion(context => context.HasRole("Accounting"))
+        //.RequireAssertion(context =>
+        //{
+        //    return context.User.IsInRole("Accounting");
+        //})
+        //.RequireAssertion(context => context.User.HasScope("roles"))
+        .Build();
+});
 
 #endregion
 

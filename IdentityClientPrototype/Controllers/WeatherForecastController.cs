@@ -1,11 +1,10 @@
 using IdentityClientPrototype.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenIddict.Validation.AspNetCore;
 
 namespace IdentityClientPrototype.Controllers
 {
-    [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+    [Authorize]
     [ApiController]
     [Route("weather-forecast/")]
     public class WeatherForecastController : ControllerBase
