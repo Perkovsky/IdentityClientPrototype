@@ -12,6 +12,9 @@ namespace IdentityClientPrototype.Extensions
             var sw = new Stopwatch();
             sw.Start();
 
+            if (!context.User.Identity?.IsAuthenticated ?? false)
+                return false;
+
             if (context.Resource is not DefaultHttpContext httpContext)
                 return false;
 
